@@ -26,8 +26,6 @@ window.onload = function() {
 }
 
 function playFun() {
-	var title=document.getElementById('title');
-	var play=document.getElementById('play');
     timer = setInterval(function() {
         var random = Math.floor(Math.random() * data.length);
         title.innerHTML = data[random];
@@ -36,7 +34,6 @@ function playFun() {
 }
 
 function stopFun() {
-	var play=document.getElementById('play');
     clearInterval(timer);
     play.style.background = '#036';
 }
