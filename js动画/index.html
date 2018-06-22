@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>函数的封装(多属性),动画的停止-分段动画</title>
+    <style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .box {
+        width: 100px;
+        height: 100px;
+        background-color: #F10250;
+        margin: 50px;
+        position: relative;
+    }
+    </style>
+    <script type="text/javascript">
+    function getStyle(element, styleName) {
+        if (element.currentStyle) {
+            return element.currentStyle[styleName];
+        } else {
+            return window.getComputedStyle(element, null)[styleName];
+        }
+    }
+
+    function animate(element, json, fun) {
+        //element.timer的意思是给当前元素添加一个timer属性
+        //在这里是添加一个计时器
+        clearInterval(element.timer);
+        var isStop = false;
+        element.timer = setInterval(function() {
+            for (var key in json) {
+                isStop = true;
+                //通过in循环,获取到的是json中的css属性名key
+                //通过json[key],可以获取key属性的值
+                var target = json[key];
+                var current = parseInt(getStyle(element, key));
+                var setp = (target - current) / 10;
+                //当current的值是一个大于target的值的时候
+                //此时setp是一个小于零的数,此时向上取整为零
+                //所以需要判断setp是否大于零,大于零向上取整,小于零向下取整
+                setp = setp > 0 ? Math.ceil(setp) : Math.floor(setp);
+                current += setp;
+                console.log(current);
+                //只要有一个属性动画没有结束,就不停止动画
+                //不能用只要有一个属性动画完成就停止动画的思路,
+                //因为此时不是所有属性的动画都已经完成
+                //不停止动画
+                if (Math.abs(target - current) > Math.abs(setp)) {
+                    isStop = false;
+                } else {
+                    //强制将current = target
+                    current = target;
+                }
+                element.style[key] = current + "px";
+                //停止动画
+                if (isStop) {
+                    clearInterval(element.timer);
+                    //添加回调函数
+                    //判断传入的是一个函数
+                    if (typeof fun == "function") {
+                        fun();
+                    }
+                }
+            }
+        }, 10);
+    }
+    window.onload = function() {
+        var box = document.getElementsByClassName("box")[0];
+        box.onclick = function() {
+            animate(box, {
+                left: 400,
+            }, function() {
+                animate(box, {
+                    width: 500
+                }, function() {
+                    animate(box, {
+                        height: 500
+                    }, null);
+                });
+            });
+        }
+
+    }
+    </script>
+</head>
+
+<body>
+    <div class="box"></div>
+    <div class="hezi" style="background-color: green"></div>
+</body>
+
+</html>
